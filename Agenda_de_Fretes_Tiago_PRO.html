@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda de Fretes Tiago PRO</title>
+<style>
+body{font-family:Arial;background:#f4f4f4;margin:0;padding:15px}
+.card{background:#fff;padding:15px;margin-bottom:15px;border-radius:12px}
+input,select,textarea{width:100%;padding:8px;margin:4px 0;box-sizing:border-box}
+button{padding:10px 15px}
+h1,h2{margin-top:0}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ddd;padding:6px}
+.total{font-size:20px;font-weight:bold}
+</style>
+</head>
+<body>
+
+<h1>🚚 Agenda de Fretes Tiago PRO</h1>
+
+<div class="card">
+<h2>Dashboard</h2>
+<div class="total">Faturamento: R$ <span id="fat">0</span></div>
+<div class="total">Gastos: R$ <span id="gas">0</span></div>
+<div class="total">Lucro: R$ <span id="luc">0</span></div>
+</div>
+
+<div class="card">
+<h2>Novo Frete</h2>
+<input id="cliente" placeholder="Cliente">
+<input id="telefone" placeholder="Telefone">
+<input id="coleta" placeholder="Endereço de coleta">
+<input id="entrega" placeholder="Endereço de entrega">
+<input id="data" type="date">
+<input id="valor" type="number" placeholder="Valor do frete">
+<button onclick="salvarFrete()">Salvar Frete</button>
+</div>
+
+<div class="card">
+<h2>Novo Gasto</h2>
+<select id="categoria">
+<option>Combustível</option>
+<option>Pedágio</option>
+<option>Manutenção</option>
+<option>Alimentação</option>
+<option>Outros</option>
+</select>
+<input id="valorGasto" type="number" placeholder="Valor">
+<button onclick="salvarGasto()">Salvar Gasto</button>
+</div>
+
+<div class="card">
+<h2>Fretes</h2>
+<table>
+<thead><tr><th>Cliente</th><th>Data</th><th>Valor</th></tr></thead>
+<tbody id="fretes"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>Gastos</h2>
+<table>
+<thead><tr><th>Categoria</th><th>Valor</th></tr></thead>
+<tbody id="gastos"></tbody>
+</table>
+</div>
+
+<script>
+let fretes = JSON.parse(localStorage.getItem('fretes')||'[]');
+let gastos = JSON.parse(localStorage.getItem('gastos')||'[]');
+
+function salvarFrete(){
+fretes.push({
+cliente:cliente.value,
+telefone:telefone.value,
+coleta:coleta.value,
+entrega:entrega.value,
+data:data.value,
+valor:Number(valor.value||0)
+});
+localStorage.setItem('fretes',JSON.stringify(fretes));
+atualizar();
+}
+
+function salvarGasto(){
+gastos.push({
+categoria:categoria.value,
+valor:Number(valorGasto.value||0)
+});
+localStorage.setItem('gastos',JSON.stringify(gastos));
+atualizar();
+}
+
+function atualizar(){
+let tf='';
+let tg='';
+let faturamento=0;
+let totalGastos=0;
+
+fretes.forEach(f=>{
+faturamento+=f.valor;
+tf+=`<tr><td>${f.cliente}</td><td>${f.data}</td><td>R$ ${f.valor.toFixed(2)}</td></tr>`;
+});
+
+gastos.forEach(g=>{
+totalGastos+=g.valor;
+tg+=`<tr><td>${g.categoria}</td><td>R$ ${g.valor.toFixed(2)}</td></tr>`;
+});
+
+document.getElementById('fretes').innerHTML=tf;
+document.getElementById('gastos').innerHTML=tg;
+document.getElementById('fat').innerText=faturamento.toFixed(2);
+document.getElementById('gas').innerText=totalGastos.toFixed(2);
+document.getElementById('luc').innerText=(faturamento-totalGastos).toFixed(2);
+}
+
+atualizar();
+</script>
+</body>
+</html>
